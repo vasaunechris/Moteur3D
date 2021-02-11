@@ -7,7 +7,7 @@
 
 using namespace std;
  
-Model::Model(const string file) : vertex(), faces(), faces_tex(), uv(), texture(){
+Model::Model(const string file) : vertex(), faces(), faces_tex(), faces_norm(), uv(), norm(), texture(){
     
     ifstream fichier(file.c_str(), ios::in);  // on ouvre le fichier en lecture
  
@@ -34,22 +34,33 @@ Model::Model(const string file) : vertex(), faces(), faces_tex(), uv(), texture(
                 char trash;
                 vector<int> face;
                 vector<int> tex;
-                int itrash, i, j;
+                vector<int> norm;
+                int i, j, k;
                 iss >> trash;
-                while (iss >> i >> trash >> j >> trash >> itrash) {
+                while (iss >> i >> trash >> j >> trash >> k) {
                     i--; 
                     j--;
+                    k--;
                     face.push_back(i);
                     tex.push_back(j);
+                    norm.push_back(k);
                 }
                 faces.push_back(face);
                 faces_tex.push_back(tex);
+                faces_norm.push_back(norm);
                 
             }else if (type == "vt"){
                 double u = atof(ligne.substr(ligne.find(" ",1),ligne.find(" ",4)).c_str());
                 temp = ligne.substr(ligne.find(" ",5),ligne.size()).c_str();
                 double v = atof(temp.substr(0,temp.find(" ",1)).c_str());
                 uv.push_back(vec<2>(u,v));
+                
+            }else if (type == "vn"){
+                double x = atof(ligne.substr(ligne.find(" ",1),ligne.find(" ",4)).c_str());
+                temp = ligne.substr(ligne.find(" ",5),ligne.size()).c_str();
+                double y = atof(temp.substr(0,temp.find(" ",1)).c_str());
+                double z = atof(temp.substr(temp.find(" ",1),temp.find(" ",2)).c_str());
+                norm.push_back(vec<3>(x,y,z));
                 
             }
             
@@ -88,9 +99,21 @@ vector<int> Model::getFaceTex(int i){
     
 }
 
+vector<int> Model::getFaceNorm(int i){
+    
+    return faces_norm[i];
+    
+}
+
 vec<2> Model::getUV(int i){
     
     return uv[i];
+    
+}
+
+vec<3> Model::getNorm(int i){
+    
+    return norm[i];
     
 }
 

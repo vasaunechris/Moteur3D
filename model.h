@@ -13,7 +13,9 @@ private :
     std::vector<vec<3>> vertex;
     std::vector<std::vector<int>>faces;
     std::vector<std::vector<int>>faces_tex;
+    std::vector<std::vector<int>>faces_norm;
     std::vector<vec<2>> uv;
+    std::vector<vec<3>> norm;
     TGAImage texture;
         
 public:
@@ -23,7 +25,9 @@ public:
     vec<3> getVertex(int i);
     std::vector<int> getFace(int i);
     std::vector<int> getFaceTex(int i);
+    std::vector<int> getFaceNorm(int i);
     vec<2> getUV(int i);
+    vec<3> getNorm(int i);
     TGAImage getTexture();
     int getVertexSize();
     int getFacesSize();
