@@ -119,6 +119,16 @@ mat<4,4> viewport (int x, int y, int w, int h){
     return m;
 }
 
+mat<4,4> lookAt (vec<3> eye, vec<3> center, vec<3> up){
+    
+    mat<4,4> m;
+    
+    
+    
+    
+    return m;
+}
+
 
 vec<3> barycentric (vec<3> pts[3], vec<2> p){
     
