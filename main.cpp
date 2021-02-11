@@ -88,13 +88,14 @@ mat<4,4> vec2Mat (vec<3> v){
 
 mat<4,4> projection (mat<4,4> m, vec<3> cam){
     
-    mat<4,4> proj = mat<4,4>::identity();
+    mat<4,4> proj;
     proj[3][2] = -1.f/cam.z;
     proj[0][0] = 1;
     proj[1][1] = 1;
     proj[2][2] = 1;
     proj[3][3] = 1;
-    return m*proj;
+
+    return proj*m;
     
 }
 
@@ -172,7 +173,7 @@ int main(int argc, char** argv) {
         for(int j = 0; j < 3; j++){
             uv[j] = model->getUV(face_tex[j]);
             world_coords[j] = model->getVertex(face[j]);
-            screen_coords[j] = mat2Vec(projection(vec2Mat(vec<3>((world_coords[j].x+1.)*width/2., (world_coords[j].y+1.)*height/2.,world_coords[j].z)),cam));
+            screen_coords[j] = mat2Vec(projection(vec2Mat(vec<3>((world_coords[j].x+1.)*width/4., (world_coords[j].y+1.)*height/4.,world_coords[j].z)),cam));
         }
         
         vec<3> n = cross(world_coords[2] - world_coords[0],world_coords[1] - world_coords[0]).normalize();
