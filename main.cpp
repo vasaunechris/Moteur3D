@@ -143,7 +143,7 @@ vec<3> barycentric (vec<3> pts[3], vec<2> p){
 }
 
 
-void triangle (vec<3> *pts, vec<2> *uvs, float *zbuffer, TGAImage &image, TGAImage &texture, float intensite){
+void triangle (vec<3> *pts, vec<2> *uvs, vec<3> *intensites,float *zbuffer, TGAImage &image, TGAImage &texture, float intensite){
     
     vec<2> p1 = vec<2>(numeric_limits<double>::max(),0);
     vec<2> p2 = vec<2>(0,numeric_limits<double>::max());
@@ -161,13 +161,15 @@ void triangle (vec<3> *pts, vec<2> *uvs, float *zbuffer, TGAImage &image, TGAIma
         for(int y = p2.y; y <= p1.y; y++){
             baryc = barycentric(pts, vec<2>(x,y));
             vec<2> uv;
+            vec<3> intensit;
             z = vec<3>(pts[0].z, pts[1].z, pts[2].z)*baryc ;
             if((baryc.x > 0.0 && baryc.x < 1.0) && (baryc.y > 0.0 && baryc.y < 1.0) && (baryc.z > 0.0 && baryc.z < 1.0)){
                 if(zbuffer[int(x+y*width)]<z){
                     uv = baryc.x*uvs[0] + baryc.y*uvs[1] + baryc.z*uvs[2];
+                    intensit = baryc.x*intensites[0] + baryc.y*intensites[1] + baryc.z*intensites[2];
                     zbuffer[int(x+y*width)] = z;
                     TGAColor coul = texture.get(uv.x*texture.get_width(),uv.y*texture.get_height());
-                    image.set(x, y, TGAColor(coul.r*intensite, coul.g*intensite, coul.b*intensite, 255));
+                    image.set(x, y, TGAColor(coul.r*intensit.x, coul.g*intensit.y, coul.b*intensit.z, 255));
                 }
             }
         }
@@ -206,7 +208,7 @@ int main(int argc, char** argv) {
         vec<3> n = cross(world_coords[2] - world_coords[0],world_coords[1] - world_coords[0]).normalize();
         float intensite = n * light;
         if(intensite > 0.0){
-            triangle(screen_coords, uv, zbuffer, image, texture, intensite);
+            triangle(screen_coords, uv, light_coords, zbuffer, image, texture, intensite);
         }
     }
     
