@@ -119,8 +119,9 @@ mat<4,4> viewport (int x, int y, int w, int h){
     return m;
 }
 
-mat<4,4> lookAt (vec<3> eye, vec<3> center, vec<3> up){
+mat<4,4> lookAt (vec<3> cam){
     
+    cam.normalize();
     mat<4,4> m;
     
     
@@ -190,10 +191,13 @@ int main(int argc, char** argv) {
     for(int i = 0; i < model->getFacesSize(); i++){
         vector<int> face = model->getFace(i);
         vector<int> face_tex = model->getFaceTex(i);
+        vector<int> face_norm = model->getFaceNorm(i);
         vec<3> screen_coords[3];
         vec<3> world_coords[3];
+        vec<3> light_coords[3];
         vec<2> uv[3];
         for(int j = 0; j < 3; j++){
+            light_coords[j] = model->getNorm(face_norm[j]);
             uv[j] = model->getUV(face_tex[j]);
             world_coords[j] = model->getVertex(face[j]);
             screen_coords[j] = mat2Vec(view * projection(vec2Mat(world_coords[j]),cam));
@@ -208,15 +212,6 @@ int main(int argc, char** argv) {
     
     
     delete model;
-    
-    /*srand (time(NULL));
-    
-    for(int i = 0; i < 10; i++){
-        
-        vec<2> pts[3] = {vec<2>(rand()%800, rand()%800), vec<2>(rand()%800, rand()%800), vec<2>(rand()%800, rand()%800)};
-        triangle(pts, image, TGAColor(rand()%255, rand()%255, rand()%255, 255));
-        
-    }*/
         
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");
