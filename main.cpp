@@ -72,7 +72,6 @@ void line (vec<2> p1, vec<2> p2, TGAImage &image, TGAColor color){
     //////////
 }
 
-
 mat<4,4> vec2Mat (vec<3> v){
     
     mat<4,4> m;
@@ -84,7 +83,6 @@ mat<4,4> vec2Mat (vec<3> v){
     return m;
     
 }
-
 
 mat<4,4> projection (mat<4,4> m, vec<3> cam){
     
@@ -99,12 +97,26 @@ mat<4,4> projection (mat<4,4> m, vec<3> cam){
     
 }
 
-
-
 vec<3> mat2Vec (mat<4,4> mat){
     
     return vec<3>((mat[0][0]/mat[3][0]),(mat[1][0]/mat[3][0]),(mat[2][0]/mat[3][0]));
 
+}
+
+mat<4,4> viewport (int x, int y, int w, int h){
+    
+    mat<4,4> m;
+    m[0][3] = x + w/2.f;
+    m[1][3] = y + h/2.f;
+    m[2][3] = 255/2.f;
+    m[3][3] = 1;
+    
+    m[0][0] = w/2.f;
+    m[1][1] = h/2.f;
+    m[2][2] = 255/2.f;
+    
+    cerr << m << endl;
+    return m;
 }
 
 
@@ -158,6 +170,7 @@ int main(int argc, char** argv) {
 	TGAImage image(width, height, TGAImage::RGB);
     Model *model = new Model("obj/african_head.obj");
     TGAImage texture = model->getTexture();
+    mat<4,4> view = viewport(width/8, height/8, width * 3/4, height * 3/4);
     
     model->getFacesSize();
     for(int i = 0; i < width*height;i++){
@@ -173,7 +186,7 @@ int main(int argc, char** argv) {
         for(int j = 0; j < 3; j++){
             uv[j] = model->getUV(face_tex[j]);
             world_coords[j] = model->getVertex(face[j]);
-            screen_coords[j] = mat2Vec(projection(vec2Mat(vec<3>((world_coords[j].x+1.)*width/4., (world_coords[j].y+1.)*height/4.,world_coords[j].z)),cam));
+            screen_coords[j] = mat2Vec(view * projection(vec2Mat(world_coords[j]),cam));
         }
         
         vec<3> n = cross(world_coords[2] - world_coords[0],world_coords[1] - world_coords[0]).normalize();
