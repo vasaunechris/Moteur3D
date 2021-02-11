@@ -94,7 +94,6 @@ mat<4,4> projection (mat<4,4> m, vec<3> cam){
     proj[1][1] = 1;
     proj[2][2] = 1;
     proj[3][3] = 1;
-    cerr << (m*proj)<< endl;
     return m*proj;
     
 }
@@ -168,18 +167,15 @@ int main(int argc, char** argv) {
         vector<int> face = model->getFace(i);
         vector<int> face_tex = model->getFaceTex(i);
         vec<3> screen_coords[3];
-        vec<2> screen_coords_tex[3];
         vec<3> world_coords[3];
         vec<2> uv[3];
         for(int j = 0; j < 3; j++){
             uv[j] = model->getUV(face_tex[j]);
-            screen_coords_tex[j] = vec<2>((uv[j].x * 1024),(uv[j].y * 1024));
             world_coords[j] = model->getVertex(face[j]);
             screen_coords[j] = mat2Vec(projection(vec2Mat(vec<3>((world_coords[j].x+1.)*width/2., (world_coords[j].y+1.)*height/2.,world_coords[j].z)),cam));
         }
         
-        vec<3> n = cross(world_coords[2] - world_coords[0],world_coords[1] - world_coords[0]);
-        n.normalize();
+        vec<3> n = cross(world_coords[2] - world_coords[0],world_coords[1] - world_coords[0]).normalize();
         float intensite = n * light;
         if(intensite > 0.0){
             triangle(screen_coords, uv, zbuffer, image, texture, intensite);
@@ -198,7 +194,6 @@ int main(int argc, char** argv) {
         
     }*/
         
-    image.set(1,1,texture.get(50,50));
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");
 	return 0;
