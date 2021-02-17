@@ -20,7 +20,7 @@ int height = 800;
 vec<3> light = {0,0,-1};
 vec<3> cam = {0,0,3};
     
-    float *zbuffer = new float[width*height];
+float *zbuffer = new float[width*height];
 
 
 void line (vec<2> p1, vec<2> p2, TGAImage &image, TGAColor color){
@@ -115,19 +115,27 @@ mat<4,4> viewport (int x, int y, int w, int h){
     m[1][1] = h/2.f;
     m[2][2] = 255/2.f;
     
-    cerr << m << endl;
     return m;
 }
 
-mat<4,4> lookAt (vec<3> cam){
+mat<4,4> lookAt (vec<3>origine, vec<3> target){
     
-    cam.normalize();
-    mat<4,4> m;
+    vec<3> up = vec<3>(.0,1.,.0);
+    mat<4,4> m = mat<4,4>::identity();
+    mat<4,4> m2 = mat<4,4>::identity();
+    vec<3> dir = (target - origine).normalize();
+    vec<3> right = cross(up,dir).normalize();
+    vec<3> cUp = cross(dir,right);
     
+    m2[0][3] = -origine.x;
+    m2[1][3] = -origine.y;
+    m2[2][3] = -origine.z;
     
+    m[0][0] = right.x;  m[0][1] = right.y;   m[0][2] = right.z;
+    m[1][0] = dir.x;    m[1][1] = dir.y;     m[1][2] = dir.z;
+    m[2][0] = cUp.x;    m[2][1] = cUp.y;     m[2][2] = cUp.z;
     
-    
-    return m;
+    return m*m2;
 }
 
 
@@ -169,7 +177,7 @@ void triangle (vec<3> *pts, vec<2> *uvs, vec<3> *intensites,float *zbuffer, TGAI
                     intensit = baryc.x*intensites[0] + baryc.y*intensites[1] + baryc.z*intensites[2];
                     zbuffer[int(x+y*width)] = z;
                     TGAColor coul = texture.get(uv.x*texture.get_width(),uv.y*texture.get_height());
-                    image.set(x, y, TGAColor(coul.r*intensit.x, coul.g*intensit.y, coul.b*intensit.z, 255));
+                    image.set(x, y, TGAColor(coul.r*intensite, coul.g*intensite, coul.b*intensite, 255));
                 }
             }
         }
@@ -183,7 +191,9 @@ int main(int argc, char** argv) {
 	TGAImage image(width, height, TGAImage::RGB);
     Model *model = new Model("obj/african_head.obj");
     TGAImage texture = model->getTexture();
+    
     mat<4,4> view = viewport(width/8, height/8, width * 3/4, height * 3/4);
+    mat<4,4> look = lookAt(vec<3>(1.,1.,3.),vec<3>(.0,.0,.0));
     
     model->getFacesSize();
     for(int i = 0; i < width*height;i++){
@@ -202,7 +212,7 @@ int main(int argc, char** argv) {
             light_coords[j] = model->getNorm(face_norm[j]);
             uv[j] = model->getUV(face_tex[j]);
             world_coords[j] = model->getVertex(face[j]);
-            screen_coords[j] = mat2Vec(view * projection(vec2Mat(world_coords[j]),cam));
+            screen_coords[j] = mat2Vec(view * projection(vec2Mat(world_coords[j]),cam)* look);
         }
         
         vec<3> n = cross(world_coords[2] - world_coords[0],world_coords[1] - world_coords[0]).normalize();
