@@ -17,11 +17,11 @@ const TGAColor green = TGAColor(0, 255,   0,   255);
 const TGAColor blue = TGAColor(0, 0,   255,   255);
 int width = 800;
 int height = 800;
-vec<3> light = {-1,-1,-1};
-vec<3> cam = {1.,1.,3.};
+vec<3> light = {0,0,-1};
+vec<3> cam = {0,1.,3.};
     
 float *zbuffer = new float[width*height];
-
+ 
 
 void line (vec<2> p1, vec<2> p2, TGAImage &image, TGAColor color){
     
@@ -209,14 +209,16 @@ int main(int argc, char** argv) {
         vec<3> light_coords[3];
         vec<2> uv[3];
         for(int j = 0; j < 3; j++){
+            
             light_coords[j] = model->getNorm(face_norm[j]);
             uv[j] = model->getUV(face_tex[j]);
             world_coords[j] = model->getVertex(face[j]);
             screen_coords[j] = mat2Vec(view * projection(vec2Mat(world_coords[j]),look,cam));
+            
         }
         
         vec<3> n = cross(world_coords[2] - world_coords[0],world_coords[1] - world_coords[0]).normalize();
-        float intensite = n * light;
+        float intensite = n * light.normalize();
         if(intensite > 0.0 ){
             triangle(screen_coords, uv, light_coords, zbuffer, image, texture, intensite);
         }
