@@ -170,7 +170,7 @@ void triangle (vec<3> *pts, vec<2> *uvs, float *intensites, float *zbuffer, TGAI
             
             baryc = barycentric(pts, vec<2>(x,y));
             vec<2> uv;
-            vec<3> intensit;
+            float intensit;
             z = vec<3>(pts[0].z, pts[1].z, pts[2].z)*baryc ;
             
             if((baryc.x > 0.0 && baryc.x < 1.0) && (baryc.y > 0.0 && baryc.y < 1.0) && (baryc.z > 0.0 && baryc.z < 1.0)){
@@ -180,7 +180,7 @@ void triangle (vec<3> *pts, vec<2> *uvs, float *intensites, float *zbuffer, TGAI
                     intensit = baryc.x * intensites[0] + baryc.y * intensites[1] + baryc.z * intensites[2];
                     zbuffer[int(x+y*width)] = z;
                     TGAColor coul = texture.get(uv.x*texture.get_width(),uv.y*texture.get_height());
-                    image.set(x, y, TGAColor(coul.r*intensit.x, coul.g*intensit.y, coul.b*intensit.z, 255));
+                    image.set(x, y, TGAColor(coul.r*intensit, coul.g*intensit, coul.b*intensit, 255));
                     
                 }
             }
