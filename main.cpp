@@ -17,8 +17,8 @@ const TGAColor green = TGAColor(0, 255,   0,   255);
 const TGAColor blue = TGAColor(0, 0,   255,   255);
 int width = 800;
 int height = 800;
-vec<3> light = {0,0,-1};
-vec<3> cam = {0,0,3};
+vec<3> light = {-1,-1,-1};
+vec<3> cam = {1.,1.,3.};
     
 float *zbuffer = new float[width*height];
 
@@ -193,7 +193,7 @@ int main(int argc, char** argv) {
     TGAImage texture = model->getTexture();
     
     mat<4,4> view = viewport(width/8, height/8, width * 3/4, height * 3/4);
-    mat<4,4> look = lookAt(vec<3>(1.,1.,3.),vec<3>(.0,.0,.0));
+    mat<4,4> look = lookAt(cam,vec<3>(.0,.0,.0));
     
     model->getFacesSize();
     for(int i = 0; i < width*height;i++){
@@ -217,7 +217,7 @@ int main(int argc, char** argv) {
         
         vec<3> n = cross(world_coords[2] - world_coords[0],world_coords[1] - world_coords[0]).normalize();
         float intensite = n * light;
-        if(intensite > 0.0){
+        if(intensite > 0.0 ){
             triangle(screen_coords, uv, light_coords, zbuffer, image, texture, intensite);
         }
     }
