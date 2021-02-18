@@ -177,7 +177,8 @@ void triangle (vec<3> *pts, vec<2> *uvs, float *intensites, float *zbuffer, TGAI
                 if(zbuffer[int(x+y*width)]<z){
                     
                     uv = baryc.x*uvs[0] + baryc.y*uvs[1] + baryc.z*uvs[2];
-                    intensit = baryc.x * intensites[0] + baryc.y * intensites[1] + baryc.z * intensites[2];
+                    intensit = -(baryc.x * intensites[0] + baryc.y * intensites[1] + baryc.z * intensites[2]);
+                    printf("i = %f, i2 = %f\n",intensit, intensite);
                     zbuffer[int(x+y*width)] = z;
                     TGAColor coul = texture.get(uv.x*texture.get_width(),uv.y*texture.get_height());
                     image.set(x, y, TGAColor(coul.r*intensit, coul.g*intensit, coul.b*intensit, 255));
