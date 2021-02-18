@@ -18,7 +18,7 @@ const TGAColor blue = TGAColor(0, 0,   255,   255);
 int width = 800;
 int height = 800;
 vec<3> light = {0,0,-1};
-vec<3> cam = {0,1.,3.};
+vec<3> cam = {0,0,3.};
     
 float *zbuffer = new float[width*height];
  
@@ -178,11 +178,11 @@ void triangle (vec<3> *pts, vec<2> *uvs, float *intensites, float *zbuffer, TGAI
                     
                     uv = baryc.x*uvs[0] + baryc.y*uvs[1] + baryc.z*uvs[2];
                     intensit = -(baryc.x * intensites[0] + baryc.y * intensites[1] + baryc.z * intensites[2]);
-                    printf("i = %f, i2 = %f\n",intensit, intensite);
                     zbuffer[int(x+y*width)] = z;
                     TGAColor coul = texture.get(uv.x*texture.get_width(),uv.y*texture.get_height());
-                    image.set(x, y, TGAColor(coul.r*intensit, coul.g*intensit, coul.b*intensit, 255));
-                    
+                    if(intensit > 0){
+                        image.set(x, y, TGAColor(coul.r*intensit, coul.g*intensit, coul.b*intensit, 255));
+                    }
                 }
             }
         }
@@ -226,9 +226,9 @@ int main(int argc, char** argv) {
         
         vec<3> n = cross(world_coords[2] - world_coords[0],world_coords[1] - world_coords[0]).normalize();
         float intensite = n * light.normalize();
-        if(intensite > 0.0 ){
-            triangle(screen_coords, uv, light_coord, zbuffer, image, texture, intensite);
-        }
+        //if(intensite > 0.0 ){
+        triangle(screen_coords, uv, light_coord, zbuffer, image, texture, intensite);
+        //}
     }
     
     
