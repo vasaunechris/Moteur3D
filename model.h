@@ -17,6 +17,7 @@ private :
     std::vector<vec<2>> uv;
     std::vector<vec<3>> norm;
     TGAImage texture;
+    TGAImage norm_texture;
         
 public:
     

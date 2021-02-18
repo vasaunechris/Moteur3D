@@ -7,7 +7,7 @@
 
 using namespace std;
  
-Model::Model(const string file) : vertex(), faces(), faces_tex(), faces_norm(), uv(), norm(), texture(){
+Model::Model(const string file) : vertex(), faces(), faces_tex(), faces_norm(), uv(), norm(), texture(), norm_texture(){
     
     ifstream fichier(file.c_str(), ios::in);  // on ouvre le fichier en lecture
  
@@ -69,6 +69,11 @@ Model::Model(const string file) : vertex(), faces(), faces_tex(), faces_norm(), 
         string s = file.substr(0,file.find(".")) + "_diffuse.tga";
         texture.read_tga_file(s.c_str());
         texture.flip_vertically();
+        
+        s = file.substr(0,file.find(".")) + "_nm_tangent.tga";
+        norm_texture.read_tga_file(s.c_str());
+        norm_texture.flip_vertically();
+        
         fichier.close();// on ferme le fichier
         
     }else{ // sinon
