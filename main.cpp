@@ -84,7 +84,7 @@ mat<4,4> vec2Mat (vec<3> v){
     
 }
 
-mat<4,4> projection (mat<4,4> m, vec<3> cam){
+mat<4,4> projection (mat<4,4> m, mat<4,4> look ,vec<3> cam){
     
     mat<4,4> proj;
     proj[3][2] = -1.f/cam.z;
@@ -93,7 +93,7 @@ mat<4,4> projection (mat<4,4> m, vec<3> cam){
     proj[2][2] = 1;
     proj[3][3] = 1;
 
-    return proj*m;
+    return proj*look*m;
     
 }
 
@@ -118,22 +118,22 @@ mat<4,4> viewport (int x, int y, int w, int h){
     return m;
 }
 
-mat<4,4> lookAt (vec<3>origine, vec<3> target){
+mat<4,4> lookAt (vec<3>eye, vec<3> center){
     
     vec<3> up = vec<3>(.0,1.,.0);
     mat<4,4> m = mat<4,4>::identity();
     mat<4,4> m2 = mat<4,4>::identity();
-    vec<3> dir = (target - origine).normalize();
-    vec<3> right = cross(up,dir).normalize();
-    vec<3> cUp = cross(dir,right);
+    vec<3> z = (eye - center).normalize();
+    vec<3> x = cross(up,z).normalize();
+    vec<3> y = cross(z,x).normalize();
     
-    m2[0][3] = -origine.x;
-    m2[1][3] = -origine.y;
-    m2[2][3] = -origine.z;
+    m2[0][3] = -center.x;
+    m2[1][3] = -center.y;
+    m2[2][3] = -center.z;
     
-    m[0][0] = right.x;  m[0][1] = right.y;   m[0][2] = right.z;
-    m[1][0] = dir.x;    m[1][1] = dir.y;     m[1][2] = dir.z;
-    m[2][0] = cUp.x;    m[2][1] = cUp.y;     m[2][2] = cUp.z;
+    m[0][0] = x.x;  m[0][1] = x.y;   m[0][2] = x.z;
+    m[1][0] = y.x;  m[1][1] = y.y;   m[1][2] = y.z;
+    m[2][0] = z.x;  m[2][1] = z.y;   m[2][2] = z.z;
     
     return m*m2;
 }
@@ -212,7 +212,7 @@ int main(int argc, char** argv) {
             light_coords[j] = model->getNorm(face_norm[j]);
             uv[j] = model->getUV(face_tex[j]);
             world_coords[j] = model->getVertex(face[j]);
-            screen_coords[j] = mat2Vec(view * projection(vec2Mat(world_coords[j]),cam)* look);
+            screen_coords[j] = mat2Vec(view * projection(vec2Mat(world_coords[j]),look,cam));
         }
         
         vec<3> n = cross(world_coords[2] - world_coords[0],world_coords[1] - world_coords[0]).normalize();
